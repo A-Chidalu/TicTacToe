@@ -27,9 +27,17 @@ const joinRoom = (req: Request, res: Response) => {
     //TODO: Validate that the query parameters in the request are valid
 
     //for now just send them the right html page
+    const roomId: string | undefined = req.query.roomId as string;
+
+    if(roomId && roomId in rooms) {
+        res.sendFile(path.join(__dirname, '../../../frontend/html/index.html'));
+    }
+    else {
+        res.status(404).send(`Room ${roomId} not found.`);
+    }
 
 
-    res.sendFile(path.join(__dirname, '../../../frontend/html/index.html'));
+    
 };
 
 const isValidJoinRoomMessage = (joinRoomMessage: JoinRoomMessage): Boolean => {
