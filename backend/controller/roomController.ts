@@ -5,12 +5,12 @@ import { Socket } from 'socket.io';
 
 
 //Use an in-memory object for now. Not best practice but YOLO
-const rooms: {[key: string]: CreateRoomResponse[]} = {}
+const rooms: {[key: string]: RoomResponse[]} = {}
 
 const createRoom = (req: Request, res: Response) => {
     const roomId: string = shortid.generate();
     const playerId: string = shortid.generate();
-    const createRoomResponse: CreateRoomResponse = {
+    const createRoomResponse: RoomResponse = {
         roomId,
         playerId,
         playerLetter: 'X'
@@ -23,22 +23,72 @@ const createRoom = (req: Request, res: Response) => {
     res.status(201).json(createRoomResponse);
 };
 
-const joinRoom = (req: Request, res: Response) => {
-    //TODO: Validate that the query parameters in the request are valid
+const getPlayerLetterForRoom = (roomId: string): string => {
+    if(!(roomId in rooms)) {
+        throw new Error(`Room with id: ${roomId} does not exist.`);
+    }
 
-    //for now just send them the right html page
-    const roomId: string | undefined = req.query.roomId as string;
+    if(rooms[roomId].length == 0) {
+        return "X";
+    }
+    else {
+        return "O";
+    }
+}
+
+const joinRoom = (req: Request, res: Response) => {
+    const roomId: string | undefined = req.params.roomId as string;
+    console.log(`A User is attempting to join room ${roomId}. The current state of the room is ${JSON.stringify(rooms[roomId])}`)
+    if(roomId && roomId in rooms && rooms[roomId].length < 2) {
+        const playerId: string = shortid.generate();
+        const playerLetter: string = getPlayerLetterForRoom(roomId);
+
+        const joinRoomResponse: RoomResponse = {
+            roomId,
+            playerId,
+            playerLetter
+        };
+
+        res.status(200).json(joinRoomResponse);
+    }
+    else if(roomId && !(roomId in rooms)) {
+        const errorMessage: ErrorMessage = {
+            error: `RoomId ${roomId} is invalid.`
+        }
+
+        res.status(400).send(JSON.stringify(errorMessage));
+    }
+    else if(roomId && rooms[roomId].length >= 2) {
+        const errorMessage: ErrorMessage = {
+            error: `RoomId ${roomId} is already full.`
+        }
+
+        res.status(400).send(JSON.stringify(errorMessage));
+    }
+    else {
+        const errorMessage: ErrorMessage = {
+            error: `An unexpected error has occured.`
+        }
+
+        res.status(500).send(JSON.stringify(errorMessage));
+    }
+};
+
+const getRoomHtml = (req: Request, res: Response) => {
+    const roomId: string | undefined = req.params.roomId;
 
     if(roomId && roomId in rooms) {
         res.sendFile(path.join(__dirname, '../../../frontend/html/index.html'));
     }
+
     else {
-        res.status(404).send(`Room ${roomId} not found.`);
+        const errorMessage: ErrorMessage = {
+            error: `RoomId ${roomId} is invalid.`
+        }
+
+        res.status(400).send(JSON.stringify(errorMessage));
     }
-
-
-    
-};
+}
 
 const isValidJoinRoomMessage = (joinRoomMessage: JoinRoomMessage): Boolean => {
     //TODO: Implement this later
@@ -87,7 +137,8 @@ const connectToRoomSocket = (socket: Socket) => {
 export const RoomController = {
     createRoom,
     joinRoom,
-    connectToRoomSocket
+    connectToRoomSocket,
+    getRoomHtml
 }
 
 

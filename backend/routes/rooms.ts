@@ -9,8 +9,8 @@ router.post('/create', RoomController.createRoom);
 //Seems like a code smell to have two endpoints calling the same controller function but oh well
 
 //TODO: Clean-up the fact that two endpoints and calling the same controller function
-router.post('/join/:id', RoomController.joinRoom)
+router.post('/join/:roomId', RoomController.joinRoom)
 
-router.get('/:id', RoomController.joinRoom);
+router.get('/:roomId', RoomController.getRoomHtml);
 
 export default router;

@@ -25,13 +25,33 @@ const createNewRoom = async () => {
     //3. Redirect the current user to the roomId
 }
 
-const joinExistingRoom = () => {
+const joinExistingRoom = async () => {
     const roomIdInput = document.getElementById('roomIdInput');
     const roomId = roomIdInput.value;
     
     if(roomId) {
-        const newRoom = `http://localhost:3000/room/${roomId}?roomId=${roomId}`;
+        try {
+            const joinRoomResponse = await fetch(`http://localhost:3000/room/join/${roomId}`, {
+                method: 'POST'
+            });
 
-        window.location.href = newRoom;
+            const joinRoomResponseBody = await joinRoomResponse.json();
+    
+            const { playerId, playerLetter } = joinRoomResponseBody;
+            
+            const newRoom = `http://localhost:3000/room/${roomId}?playerId=${playerId}&roomId=${roomId}&playerLetter=${playerLetter}`;
+            
+            if(joinRoomResponse.ok) {
+                window.location.href = newRoom;
+            }
+            else {
+                alert(`Can not join room ${roomId}. An error occured.`);
+            }
+            
+        } catch(err) {
+            console.log(err)
+        }
+
+        
     }
 }
