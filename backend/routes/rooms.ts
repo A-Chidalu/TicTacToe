@@ -1,5 +1,6 @@
 import express from 'express';
 import {RoomController} from '../controller/roomController';
+import { Server } from 'socket.io';
 
 const router = express.Router();
 

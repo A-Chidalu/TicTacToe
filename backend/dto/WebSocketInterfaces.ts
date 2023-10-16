@@ -7,3 +7,10 @@ interface JoinRoomMessage extends WebSocketMessage {
     playerId: string, 
     playerLetter: string
 }
+
+interface PlayerMoveMessage extends WebSocketMessage {
+    moveLocation: number[],
+    roomId: string, 
+    playerId: string, 
+    playerLetter: string
+}

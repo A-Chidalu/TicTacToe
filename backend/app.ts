@@ -26,8 +26,7 @@ app.get('/', (req: Request, res: Response) => {
 
 //HANDLE WEB SOCKET STUFF
 
-io.on('connection', RoomController.connectToRoomSocket);
-
+io.on('connection', RoomController.connectToRoomSocket(io));
 
 
 // Start the Express server
