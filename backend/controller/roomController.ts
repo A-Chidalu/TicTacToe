@@ -155,7 +155,7 @@ const handlePlayerMoveWebSocketMessage = (playerMoveMessage: PlayerMoveMessage, 
             currentPlayerTurn: roomBoard[roomId].currentPlayerTurn
         }
 
-        io.to(roomId).emit('message', JSON.stringify(moveMadeResponse));
+        io.to(roomId).emit('boardChange', JSON.stringify(moveMadeResponse));
 
 
     }

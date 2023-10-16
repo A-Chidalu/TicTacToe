@@ -1,8 +1,5 @@
 const socket = io();
-socket.on("message", (message) => {
-    // Handle the received message
-    console.log("Received message:", message);
-});
+
 
 const urlParams = new URLSearchParams(window.location.search);
 
@@ -21,6 +18,11 @@ socket.emit('message', JSON.stringify(initMessage));
 
 const getGridSquares = () => {
     return document.getElementsByClassName('grid-square');
+}
+
+function initInfo() {
+    const yourLetterSpan = document.getElementById('spanYourLetter');
+    yourLetterSpan.textContent = playerLetter
 }
 
 function addBoardEventListeners() {
@@ -51,6 +53,29 @@ function addBoardEventListeners() {
 }
 
 addBoardEventListeners();
+initInfo();
+
+function updateBoard(board, currentPlayerTurn) {
+    const gridItems = getGridSquares();
+    const playerTurnSpan = document.getElementById('spanPlayerTurn');
+    for(let i = 0; i < gridItems.length; i++) {
+        const cell = gridItems[i];
+        const row = Math.floor(i / 3);
+        const col = i % 3;
+
+        cell.textContent = board[row][col]
+        playerTurnSpan.textContent = currentPlayerTurn
+    }
+}
+
+socket.on("boardChange", (message) => {
+    const boardChangeMessage = JSON.parse(message);
+    const {board, currentPlayerTurn} = boardChangeMessage;
+
+    updateBoard(board, currentPlayerTurn);
+
+    console.log("Received message:", message);
+});
 
 
   

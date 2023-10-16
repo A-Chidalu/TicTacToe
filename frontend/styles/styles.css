@@ -58,3 +58,8 @@ p.board-marker {
 p.author {
     text-align: center;
 }
+
+.info-area {
+    display: flex;
+    justify-content: center;
+}
